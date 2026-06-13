@@ -32,13 +32,15 @@ pub fn run() {
             log::info!("Setting up Maccy application");
 
             // Initialize settings
-            let settings_manager = Arc::new(SettingsManager::new()
-                .expect("Failed to initialize settings"));
+            let settings_manager = Arc::new(
+                SettingsManager::new().expect("Failed to initialize settings"),
+            );
             app.manage(Arc::clone(&settings_manager));
 
             // Initialize storage
-            let storage = Arc::new(SqliteStorage::new(None)
-                .expect("Failed to initialize storage"));
+            let storage = Arc::new(
+                SqliteStorage::new(None).expect("Failed to initialize storage"),
+            );
             app.manage(Arc::clone(&storage));
 
             // Start clipboard monitoring
@@ -55,7 +57,7 @@ pub fn run() {
 
             // Register global shortcut
             if let Err(e) = register_global_shortcut(app.handle()) {
-                log::error!("Failed to register global shortcut: {}", e);
+                log::error!("Failed to register shortcut: {}", e);
             }
 
             // Initialize platform-specific clipboard
@@ -75,6 +77,11 @@ pub fn run() {
             {
                 let clipboard = LinuxClipboard::new();
                 app.manage(clipboard);
+            }
+
+            // Hide main window on startup (tray-only launch)
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.hide();
             }
 
             Ok(())
@@ -99,6 +106,8 @@ pub fn run() {
             commands::smart::auto_cleanup,
             commands::smart::smart_search,
             commands::smart::get_statistics,
+            commands::window::hide_window,
+            commands::window::show_window,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

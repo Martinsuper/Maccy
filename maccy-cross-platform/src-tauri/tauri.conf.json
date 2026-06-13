@@ -13,12 +13,16 @@
     "withGlobalTauri": true,
     "windows": [
       {
+        "label": "main",
         "title": "Maccy",
-        "width": 400,
+        "width": 380,
         "height": 500,
+        "minWidth": 320,
+        "minHeight": 300,
         "resizable": true,
         "fullscreen": false,
         "center": true,
+        "visible": false,
         "alwaysOnTop": true,
         "skipTaskbar": true,
         "decorations": false,
@@ -35,7 +39,7 @@
       "iconPath": "icons/32x32.png",
       "iconAsTemplate": true,
       "title": "Maccy",
-      "tooltip": "Clipboard Manager"
+      "tooltip": "剪贴板管理器"
     }
   },
   "bundle": {

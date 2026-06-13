@@ -1,8 +1,9 @@
 use tauri::Manager;
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 
+use super::tray::position_window_near_tray;
+
 pub fn register_global_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
-    // Register Cmd+Shift+C (macOS) or Ctrl+Shift+C (Windows/Linux)
     #[cfg(target_os = "macos")]
     let shortcut_str = "Cmd+Shift+C";
 
@@ -15,11 +16,15 @@ pub fn register_global_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
         if event.state == ShortcutState::Pressed {
             log::info!("Global shortcut pressed");
             if let Some(window) = app.get_webview_window("main") {
-                if window.is_visible().unwrap() {
-                    let _ = window.hide();
-                } else {
-                    let _ = window.show();
-                    let _ = window.set_focus();
+                match window.is_visible() {
+                    Ok(true) => {
+                        let _ = window.hide();
+                    }
+                    _ => {
+                        position_window_near_tray(&window);
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
                 }
             }
         }
